@@ -1,0 +1,9 @@
+- python -m venv venv
+- venv\Scripts\activate
+- create main.py file
+- fastapi dev main.py
+- pip freeze > requirements.txt
+- pip install -r requirements.txt
+- pip install sqlalchemy
+- pip install albemic
+- https://fastapi.blog/blog/posts/2023-07-20-fastapi-sqlalchemy-migrations-guide/#step-2-installing-required-packages

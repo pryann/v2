@@ -1,0 +1,15 @@
+version: '1.0'
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: fastapi-mariadb
+    ports:
+      - '${MYSQL_PORT}:3306'
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    env_file:
+      - .env
