@@ -1,15 +1,22 @@
-from sqlalchemy import Column,  ForeignKey, Integer, String, Boolean,Enum
+from sqlalchemy import String
+from src.models import CustomBase
+from src.consts import UserStatusEnum
 from sqlalchemy.orm import relationship
-from ..models import CustomBase
-from ..consts import UserStatusEnum
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from sqlalchemy import ForeignKey
+from typing import List
+from src.billing_address.models import BillingAddress
 
 
 class User(CustomBase):
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True)
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    password = Column(String(255), nullable=False)
-    status = Column(Enum(UserStatusEnum),default=UserStatusEnum.unverified.value, nullable=False)
-
-    billing_addresses = relationship("BillingAddress", back_populates="user")
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    password: Mapped[str] = mapped_column(String(255))
+    status: Mapped[UserStatusEnum] = mapped_column(
+        UserStatusEnum,
+        default=UserStatusEnum.unverified.value,
+    )
+    billing_address: Mapped[List["BillingAddress"]] = relationship(lazy="selectin")

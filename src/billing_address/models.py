@@ -1,19 +1,21 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, orm
-from ..models import CustomBase
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+from src.models import CustomBase
+from typing import List
 
 
 class BillingAddress(CustomBase):
     __tablename__ = "billing_address"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    country = Column(String(255), nullable=False)
-    state = Column(Integer)
-    city = Column(String(255), nullable=False)
-    zip_code = Column(Integer, nullable=False)
-    address = Column(String(255), nullable=False)
-    tax_number = Column(String(255))
-    outside_eu = Column(Boolean, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    country: Mapped[str] = mapped_column(String(255))
+    state: Mapped[int]
+    city: Mapped[str] = mapped_column(String(255))
+    zip_code: Mapped[str] = mapped_column(String(10))
+    address: Mapped[str] = mapped_column(String(10))
+    tax_number: Mapped[str] = mapped_column(String(10))
+    outside_eu: Mapped[bool]
 
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = orm.relationship("User", back_populates="billing_addresses")
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))

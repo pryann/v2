@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
-from .schemas import User
-from . import service as user_service
+from src.user.schemas import User
+import src.user.service as user_service
 
 router = APIRouter(
     prefix="/users",
@@ -30,8 +30,8 @@ async def create_user(user: User):
 
 @router.put("/{user_id}", response_model=User)
 async def update_user(user_id: int, user: User):
-    existing_user = user_service.get_user(user_id) 
-    if (existing_user): 
+    existing_user = user_service.get_user(user_id)
+    if existing_user:
         user_service.update_user(user)
         return user
     raise HTTPException(status_code=404, detail="User not found")

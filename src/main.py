@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from h11 import Request, Response
-from .user import router as user_router
+from src.user import router as user_router
+
 # from .billing_address import router as billing_address_router
-from .billing_address.models import BillingAddress
-from .user.models import User
-from .database import SessionLocal, Base, engine
+from src.billing_address.models import BillingAddress
+from src.user.models import User
+from src.database import SessionLocal, Base, engine
 
 # table_definitions = [
 #     BillingAddress.__table__,
