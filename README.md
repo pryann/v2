@@ -7,3 +7,6 @@
 - pip install sqlalchemy
 - pip install albemic
 - https://fastapi.blog/blog/posts/2023-07-20-fastapi-sqlalchemy-migrations-guide/#step-2-installing-required-packages
+- alembic init alembic
+- alembic revision --autogenerate -m "Initial migration"
+- alembic upgrade head

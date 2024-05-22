@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, orm
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from src.models import CustomBase
+from app.models import CustomBase
 from typing import List
 
 
