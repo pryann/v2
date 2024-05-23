@@ -1,35 +1,79 @@
-from fastapi import APIRouter, HTTPException, status
-from app.user.schemas import User
-from fastapi import HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
-from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import AuthJWTException
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi.security import OAuth2PasswordBearer
+from passlib.context import CryptContext
+from datetime import timedelta
+import app.user.schemas as user_schemas
+from app.config import get_settings
+import app.auth.service as auth_service
 
-router = APIRouter(
-    prefix="/auth",
-    tags=["Auth"],
-)
-
-
-@router.exception_handler(AuthJWTException)
-def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-    return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+router = APIRouter()
+settings = get_settings()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @router.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
-    if user.username != "test" or user.password != "test":
-        raise HTTPException(status_code=401, detail="Bad username or password")
-    access_token = Authorize.create_access_token(subject=user.username)
-    refresh_token = Authorize.create_refresh_token(subject=user.username)
-    Authorize.set_access_cookies(access_token)
-    Authorize.set_refresh_cookies(refresh_token)
+async def login(response: Response, user: user_schemas.UserLogin):
+    user = auth_service.authenticate_user(user.email, user.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+        )
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth_service.create_token(
+        data={"sub": user.email},
+        expires=access_token_expires,
+        secret=settings.ACCESS_TOKEN_SECRET_KEY,
+        alrogithm=settings.ACCESS_TOKEN_ALGORITHM,
+    )
+
+    refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    refresh_token = auth_service.create_token(
+        data={"sub": user.email},
+        expires=refresh_token_expires,
+        secret=settings.REFRESH_TOKEN_SECRET_KEY,
+        alrogithm=settings.ACCESS_TOKEN_ALGORITHM,
+    )
+    response.set_cookie(
+        key="access_token", value=access_token, httponly=True, secure=True
+    )
+    response.set_cookie(
+        key="refresh_token", value=refresh_token, httponly=True, secure=True
+    )
     return {}
 
 
-@router.post("/refresh")
-def refresh(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_refresh_token_required()
-    current_user = Authorize.get_jwt_subject()
-    new_access_token = Authorize.create_access_token(subject=current_user)
-    return {"access_token": new_access_token}
+# Logout route
+@router.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="refresh_token")
+    return {}
+
+
+# Refresh token route
+@router.post("/refresh-tokens", response_model=dict)
+async def refresh_token(
+    request: Request,
+    response: Response,
+    user: user_schemas.UserRead = Depends(auth_service.get_current_user_from_token),
+):
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing"
+        )
+
+    user = auth_service.verify_refresh_token(refresh_token)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth_service.create_token(
+        data={"sub": user.email},
+        expires=access_token_expires,
+        secret=settings.ACCESS_TOKEN_SECRET_KEY,
+        alrogithm=settings.ACCESS_TOKEN_ALGORITHM,
+    )
+    response.set_cookie(
+        key="access_token", value=access_token, httponly=True, secure=True
+    )
+    return {}
