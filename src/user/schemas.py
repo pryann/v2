@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, constr, Field, field_validator
 from typing import Annotated, Optional
 from datetime import datetime
-from app.user.consts import UserStatusEnum
+from src.user.consts import UserStatusEnum
 
 password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
 
@@ -10,7 +10,7 @@ class UserBase(BaseModel):
     email: EmailStr
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserRead(UserBase):

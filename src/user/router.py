@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from app.user import schemas, service
-from app.database import get_db
+from src.user import schemas, service
+from src.database import get_db
 from sqlalchemy.orm import Session
 from typing import List
+import src.email.service as EmailService
 
 router = APIRouter(
     prefix="/users",
@@ -45,7 +46,9 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     is_exists = service.get_user_by_email(user.email, db)
     if is_exists:
         raise HTTPException(status_code=409, detail="User already exists")
-    return service.create_user(user, db)
+    new_user = service.create_user(user, db)
+    EmailService.send_html_email(new_user.email, new_user.name)
+    return new_user
 
 
 @router.put(

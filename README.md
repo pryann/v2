@@ -10,3 +10,5 @@
 - alembic init alembic
 - alembic revision --autogenerate -m "Initial migration"
 - alembic upgrade head
+
+- update all: `pip freeze | %{$_.split('==')[0]} | %{pip install --upgrade $_}`

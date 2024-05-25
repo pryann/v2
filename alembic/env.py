@@ -1,10 +1,10 @@
 from alembic import context
 from sqlalchemy import pool, engine_from_config
 from logging.config import fileConfig
-from app.user.models import User
-from app.billing_address.models import BillingAddress
-from app.models import CustomBase
-from app.config import get_settings
+from src.user.models import User
+from src.billing_address.models import BillingAddress
+from src.models import CustomBase
+from src.config import get_settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

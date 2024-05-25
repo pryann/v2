@@ -4,9 +4,9 @@ from sqlalchemy import String
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from app.user.consts import UserStatusEnum
-from app.models import CustomBase
-from app.billing_address.models import BillingAddress
+from src.user.consts import UserStatusEnum
+from src.models import CustomBase
+from src.billing_address.models import BillingAddress
 
 
 class User(CustomBase):

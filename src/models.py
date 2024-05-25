@@ -1,6 +1,6 @@
 from humps import camel
 from sqlalchemy import Column, func, DateTime
-from app.database import Base
+from src.database import Base
 
 
 def to_camel(string):
