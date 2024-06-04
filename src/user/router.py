@@ -11,7 +11,12 @@ router = APIRouter(
 )
 
 
-def get_existing_user_by_id(user_id: int, db: Session):
+async def get_user_service(session: AsyncSession = Depends(get_session)):
+    user_repository = UserRepository(session)
+    return UserService(user_repository)
+
+
+async def get_existing_user_by_id(user_id: int, db: Session):
     user = service.get_user_by_id(user_id, db)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")

@@ -1,54 +1,35 @@
-from src.user import schemas
-import src.user.crud as user_crud
-from sqlalchemy.orm import Session
-from passlib.context import CryptContext
-import os
-import base64
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
+from typing import List
+from src.user.schemas import UserCreate, UserRead, UserUpdate
+from src.user.crud import UserRepository
 
 
-# def hash_password(password):
-#     pwd_bytes = password.encode("utf-8")
-#     salt = bcrypt.gensalt()
-#     hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
-#     return hashed_password
+class UserService:
+    def __init__(self, user_repository: UserRepository):
+        self.user_repository = user_repository
 
+    def _hash_password(password) -> bytes:
+        pwd_bytes = password.encode("utf-8")
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+        return hashed_password
 
-# # Check if the provided password matches the stored password (hashed)
-# def verify_password(plain_password, hashed_password):
-#     password_byte_enc = plain_password.encode("utf-8")
-#     return bcrypt.checkpw(password=password_byte_enc, hashed_password=hashed_password)
+    def _verify_password(plain_password: str, hashed_password: str) -> bool:
+        password_byte_enc = plain_password.encode("utf-8")
+        return bcrypt.checkpw(password=password_byte_enc, hashed_password=hashed_password)
 
+    async def get_users(self) -> List[UserRead]:
+        return await self.user_repository.get_all(UserRead)
 
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    async def get_user_by_id(self, user_id: int) -> UserRead:
+        return await self.user_repository.get_by_id(user_id, UserRead)
 
+    async def create_user(self, user_data: UserCreate) -> UserRead:
+        user_data.password = self._hash_password(user_data.password)
+        return await self.user_repository.add(user_data, UserRead)
 
-def get_user_by_id(user_id: int, db: Session):
-    return user_crud.get_user_by_id(db, user_id)
+    async def update_user(self, user_id: int, user_data: UserUpdate) -> UserRead:
+        return await self.user_repository.update(user_id, user_data, UserRead)
 
-
-def get_users(
-    db: Session,
-    skip: int = 0,
-    limit: int = 100,
-):
-    return user_crud.get_users(db, skip, limit)
-
-
-def get_user_by_email(user: schemas.UserLogin, db: Session):
-    return user_crud.get_user_by_email(db, user)
-
-
-def create_user(user: schemas.UserCreate, db: Session):
-    user.password = hash_password(user.password)
-    return user_crud.create_user(db, user)
-
-
-def update_user(user_id: int, user: schemas.UserUpdate, db: Session):
-    return user_crud.update_user(db, user_id, user)
-
-
-def delete_user(user_id: int, db: Session):
-    return user_crud.delete_user(db, user_id)
+    async def delete_user(self, user_id: int) -> None:
+        await self.user_repository.delete(user_id)

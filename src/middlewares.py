@@ -2,7 +2,7 @@ import os
 import time
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException, status, Depends
 from src.config import get_settings
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -45,16 +45,11 @@ def setup_security_headers_middleware(app: FastAPI):
 def setup_process_time_middleware(app: FastAPI):
     @app.middleware("http")
     async def process_time_log_middleware(request: Request, call_next):
-
         start_time = time.time()
         response: Response = await call_next(request)
         process_time = str(round(time.time() - start_time, 3))
         response.headers["X-Process-Time"] = process_time
-        logging.info(
-            "ProcessTime=%s",
-            process_time,
-        )
-
+        logging.info("ProcessTime=%s", process_time)
         return response
 
 

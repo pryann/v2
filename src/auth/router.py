@@ -12,18 +12,15 @@ settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-router = APIRouter()
 router = APIRouter(
-    prefix="/auth",
+    prefix="/api",
     tags=["Auth"],
 )
 
 
-@router.post("/login")
-async def login(
-    response: Response, user: user_schemas.UserLogin, db: Session = Depends(get_db)
-):
-    user = auth_service.authenticate_user(db, email=user.email, password=user.password)
+@router.post("/auth/login")
+async def login(response: Response, user: user_schemas.UserLogin, db: Session = Depends(get_db)):
+    user = auth_service.authenticate_user(email=user.email, password=user.password, db=db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -44,9 +41,7 @@ async def login(
     #     secret=settings.REFRESH_TOKEN_SECRET_KEY,
     #     algorithm=settings.ACCESS_TOKEN_ALGORITHM,
     # )
-    response.set_cookie(
-        key="access_token", value=access_token, httponly=True, secure=True
-    )
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True)
     # response.set_cookie(
     #     key="refresh_token", value=refresh_token, httponly=True, secure=True
     # )
@@ -54,7 +49,7 @@ async def login(
 
 
 # Logout route
-@router.get("/logout")
+@router.get("/auth//logout")
 async def logout(response: Response):
     response.delete_cookie(key="access_token")
     response.delete_cookie(key="refresh_token")
@@ -62,13 +57,11 @@ async def logout(response: Response):
 
 
 # Refresh token route
-@router.post("/refresh-tokens", response_model=dict)
+@router.post("/auth//refresh-tokens", response_model=dict)
 async def refresh_token(request: Request, response: Response):
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
     is_valid_token = auth_service.verify_refresh_token(refresh_token)
     if not is_valid_token:
         raise HTTPException(
@@ -76,9 +69,7 @@ async def refresh_token(request: Request, response: Response):
             detail="Incorrect token data",
         )
 
-    user: user_schemas.UserRead = auth_service.get_current_user_from_token(
-        refresh_token
-    )
+    user: user_schemas.UserRead = auth_service.get_current_user_from_token(refresh_token)
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = auth_service.create_token(
         data={"sub": user.email},
@@ -86,7 +77,5 @@ async def refresh_token(request: Request, response: Response):
         secret=settings.ACCESS_TOKEN_SECRET_KEY,
         algorithm=settings.ACCESS_TOKEN_ALGORITHM,
     )
-    response.set_cookie(
-        key="access_token", value=access_token, httponly=True, secure=True
-    )
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True)
     return {}

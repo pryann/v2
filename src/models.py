@@ -1,21 +1,28 @@
 from humps import camel
-from sqlalchemy import Column, func, DateTime
-from src.database import Base
+from sqlalchemy import func, DateTime, Integer
+from sqlalchemy.orm import Mapped, declarative_base, registry, mapped_column
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 
 def to_camel(string):
     return camel(string)
 
 
+mapper_registry = registry()
+Base = mapper_registry.generate_base()
+
+
 class CustomBase(Base):
     __abstract__ = True
 
-    created_at = Column(DateTime, default=func.current_timestamp(), nullable=False)
-    updated_at = Column(
-        DateTime,
-        default=func.current_timestamp(),
-        onupdate=func.current_timestamp(),
-        nullable=False,
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    uuid: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=False, default=uuid.uuid4, unique=True, nullable=False
+    )
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=func.current_timestamp(), nullable=False)
+    updated_at: Mapped[DateTime] = mapped_column(
+        DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp(), nullable=False
     )
 
     class Config:

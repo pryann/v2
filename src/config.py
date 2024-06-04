@@ -29,7 +29,9 @@ class Settings(BaseSettings):
 
     @property
     def MYSQL_DATABASE_URL(self) -> str:
-        return f"mysql://{self.MYSQL_USER}:{self.MYSQL_PASSWORD}@{self.MYSQL_HOST}:{self.MYSQL_PORT}/{self.MYSQL_DATABASE}"
+        return (
+            f"mysql://{self.MYSQL_USER}:{self.MYSQL_PASSWORD}@{self.MYSQL_HOST}:{self.MYSQL_PORT}/{self.MYSQL_DATABASE}"
+        )
 
     model_config = SettingsConfigDict(env_file=".env")
 
