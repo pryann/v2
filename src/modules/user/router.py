@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.modules.user.service import UserService
-from src.modules.user.schemas import UserRead, UserCreate, UserUpdate
+from src.modules.user.schemas import UserRead, UserCreate, UserUpdateProfile
 from src.database.database import get_session
 from src.modules.user.crud import UserRepository
 
@@ -47,7 +47,7 @@ async def create_user(user: UserCreate, user_service: UserService = Depends(get_
 @router.put("/{user_id}", response_model=UserRead)
 async def update_user(
     user_id: int,
-    user: UserUpdate,
+    user: UserUpdateProfile,
     existed_user: UserRead = Depends(get_existing_user_by_id),
     user_service: UserService = Depends(get_user_service),
 ):

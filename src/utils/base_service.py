@@ -15,7 +15,7 @@ class BaseService(Generic[T]):
     async def get_by_id(self, obj_id: int) -> T | None:
         return await self.repository.get_by_id(obj_id)
 
-    async def add(self, obj_in: T) -> T:
+    async def create(self, obj_in: T) -> T:
         return await self.repository.create(obj_in)
 
     async def update(self, obj_id: int, update_obj: T) -> T | None:
