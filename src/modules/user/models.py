@@ -4,9 +4,9 @@ from sqlalchemy import String
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from src.user.consts import UserStatusEnum
-from src.models import CustomBase
-from src.billing_address.models import BillingAddress
+from src.modules.user.consts import UserStatusEnum
+from src.database.models import CustomBase
+from src.modules.billing_address.models import BillingAddress
 
 
 class User(CustomBase):
@@ -14,7 +14,7 @@ class User(CustomBase):
 
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True)
-    password: Mapped[str] = mapped_column(String(255))
+    password: Mapped[bytes] = mapped_column(String(255))
     status: Mapped[UserStatusEnum] = mapped_column(
         Enum(UserStatusEnum),
         default=UserStatusEnum.UNVERIFIED.value,

@@ -12,8 +12,8 @@ def send_html_email(user_email, user_name):
     message["To"] = to_address
     message["Subject"] = "Success Registration"
 
-    env = Environment(loader=FileSystemLoader("."))
-    template = env.get_template("email_template.html")
+    env = Environment(loader=FileSystemLoader(""))
+    template = env.get_template("src/modules/email/email_template.html")
     html = template.render(name=user_name)
 
     part = MIMEText(html, "html")

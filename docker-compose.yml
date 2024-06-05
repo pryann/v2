@@ -1,15 +1,14 @@
-version: '1.0'
+version: "1.0"
 
 services:
-  mariadb:
-    image: mariadb
-    container_name: fastapi-mariadb
+  postgres:
+    image: postgres
+    container_name: fastapi-postgres
     ports:
-      - '${MYSQL_PORT}:3306'
+      - "${DATABASE_PORT}:5432"
     environment:
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     env_file:
       - .env

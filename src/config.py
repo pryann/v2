@@ -4,17 +4,18 @@ from typing import List
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str
+    APP_NAME: str
+    APP_VERSION: str
     APP_ENV: str
     SERVER_HOST: str
     SERVER_PORT: int
     SERVER_LOG_LEVEL: str
-    MYSQL_HOST: str
-    MYSQL_PORT: int
-    MYSQL_DATABASE: str
-    MYSQL_USER: str
-    MYSQL_PASSWORD: str
-    MYSQL_ROOT_PASSWORD: str
+    DATABASE_ENGINE: str
+    DATABASE_HOST: str
+    DATABASE_PORT: int
+    DATABASE_NAME: str
+    DATABASE_USER: str
+    DATABASE_PASSWORD: str
     CORS_ORIGINS: str
     ACCESS_TOKEN_SECRET_KEY: str
     ACCESS_TOKEN_ALGORITHM: str
@@ -28,10 +29,9 @@ class Settings(BaseSettings):
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
 
     @property
-    def MYSQL_DATABASE_URL(self) -> str:
-        return (
-            f"mysql://{self.MYSQL_USER}:{self.MYSQL_PASSWORD}@{self.MYSQL_HOST}:{self.MYSQL_PORT}/{self.MYSQL_DATABASE}"
-        )
+    def DATABASE_URL(self) -> str:
+        async_postfix = "+asyncpg" if self.DATABASE_ENGINE == "postgresql" else ""
+        return f"{self.DATABASE_ENGINE}{async_postfix}://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
 
     model_config = SettingsConfigDict(env_file=".env")
 

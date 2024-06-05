@@ -2,9 +2,9 @@ from alembic import context
 from sqlalchemy import pool, engine_from_config
 from logging.config import fileConfig
 from src.database.models import CustomBase
-from src.config import get_settings
 from src.modules.user.models import User
-from src.modules.billing_address.models import BillingAddress
+from src.modules.billing_address import BillingAddress
+from src.config import get_settings
 
 settings = get_settings()
 config = context.config
@@ -17,9 +17,8 @@ target_metadata = CustomBase.metadata
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=settings.url,
+        url=settings.mysql_database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},

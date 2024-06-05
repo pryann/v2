@@ -4,11 +4,11 @@ from src.config import get_settings
 from typing import AsyncGenerator
 
 settings = get_settings()
-charset = "utf8mb4"
-SQLALCHEMY_DATABASE_URL = f"{settings.MYSQL_DATABASE_URL}?charset={charset}"
+SQLALCHEMY_DATABASE_URL = f"{settings.DATABASE_URL}"
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 AsyncSessionLocal = sessionmaker(
-    bind=engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False)
+    bind=engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False
+)
 Base = declarative_base()
 
 

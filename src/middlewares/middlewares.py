@@ -6,11 +6,11 @@ from fastapi import FastAPI, Request, Response, HTTPException, status, Depends
 from src.config import get_settings
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-import logging
+import logging.config
 
 settings = get_settings()
 current_dir = os.path.dirname(os.path.abspath(__file__))
-logging_ini_path = os.path.abspath(os.path.join(current_dir, "..", "logging.ini"))
+logging_ini_path = os.path.abspath(os.path.join(current_dir, "../..", "logging.ini"))
 logging.config.fileConfig(logging_ini_path, disable_existing_loggers=False)
 
 
