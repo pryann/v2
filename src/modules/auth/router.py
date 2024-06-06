@@ -1,80 +1,45 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
-from fastapi.security import OAuth2PasswordBearer
-from datetime import timedelta
-import src.modules.user.schemas as user_schemas
-from src.config import get_settings
-import src.modules.auth.service as auth_service
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.config import Settings, get_settings
 from src.database.database import get_session
-from sqlalchemy.orm import Session
-
-# settings = get_settings()
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from src.modules.auth.schemas import LoginSchema
+from src.modules.auth.service import AuthService, TokenService
+from src.modules.user.crud import UserRepository
 
 router = APIRouter(
-    prefix="/api",
+    prefix="/api/auth",
     tags=["Auth"],
 )
 
 
-# @router.post("/auth/login")
-# async def login(response: Response, user: user_schemas.UserLogin,):
-#     user = auth_service.authenticate_user(email=user.email, password=user.password, session)
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect email or password",
-#         )
-#     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = auth_service.create_token(
-#         data={"sub": user.email},
-#         expires=access_token_expires,
-#         secret=settings.ACCESS_TOKEN_SECRET_KEY,
-#         algorithm=settings.ACCESS_TOKEN_ALGORITHM,
-#     )
-
-#     # refresh_token_expires = timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
-#     # refresh_token = auth_service.create_token(
-#     #     data={"sub": user.email},
-#     #     expires=refresh_token_expires,
-#     #     secret=settings.REFRESH_TOKEN_SECRET_KEY,
-#     #     algorithm=settings.ACCESS_TOKEN_ALGORITHM,
-#     # )
-#     response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True)
-#     # response.set_cookie(
-#     #     key="refresh_token", value=refresh_token, httponly=True, secure=True
-#     # )
-#     return {}
+def get_auth_service(
+    session: AsyncSession = Depends(get_session),
+    settings: Settings = Depends(get_settings),
+) -> AuthService:
+    user_repository = UserRepository(session)
+    token_service = TokenService()
+    return AuthService(user_repository=user_repository, token_service=token_service, settings=settings)
 
 
-# # Logout route
-# @router.get("/auth//logout")
-# async def logout(response: Response):
-#     response.delete_cookie(key="access_token")
-#     response.delete_cookie(key="refresh_token")
-#     return {}
+@router.post("/login", status_code=status.HTTP_204_NO_CONTENT)
+async def login(response: Response, user: LoginSchema, auth_service: AuthService = Depends(get_auth_service)):
+    tokens = await auth_service.login(user)
+    response.set_cookie(key="access_token", value=tokens["access_token"], httponly=True, secure=True)
+    response.set_cookie(key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True)
+    return {}
 
 
-# # Refresh token route
-# @router.post("/auth//refresh-tokens", response_model=dict)
-# async def refresh_token(request: Request, response: Response):
-#     refresh_token = request.cookies.get("refresh_token")
-#     if not refresh_token:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
-#     is_valid_token = auth_service.verify_refresh_token(refresh_token)
-#     if not is_valid_token:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect token data",
-#         )
+@router.get("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(response: Response):
+    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="refresh_token")
+    return {}
 
-#     user: user_schemas.UserRead = auth_service.get_current_user_from_token(refresh_token)
-#     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = auth_service.create_token(
-#         data={"sub": user.email},
-#         expires=access_token_expires,
-#         secret=settings.ACCESS_TOKEN_SECRET_KEY,
-#         algorithm=settings.ACCESS_TOKEN_ALGORITHM,
-#     )
-#     response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True)
-#     return {}
+
+@router.get("/refresh-tokens", status_code=status.HTTP_204_NO_CONTENT)
+async def refresh_tokens(response: Response, request: Request, auth_service: AuthService = Depends(get_auth_service)):
+    refresh_token = request.cookies.get("refresh_token")
+    tokens = await auth_service.regenerate_tokens(refresh_token)
+    response.set_cookie(key="access_token", value=tokens["access_token"], httponly=True, secure=True)
+    response.set_cookie(key="refresh_token", value=tokens["refresh_token"], httponly=True, secure=True)
+    return {}

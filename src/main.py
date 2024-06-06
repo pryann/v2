@@ -10,17 +10,17 @@ settings = get_settings()
 
 app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
 app.include_router(user_router.router)
-# app.include_router(auth_router.router)
+app.include_router(auth_router.router)
 register_middlewares(app)
 register_exception_handlers(app)
 
 if __name__ == "__main__":
     uvicorn_settings_dict = {
-        "app": app,
+        "app": "src.main:app",
         "host": settings.SERVER_HOST,
         "port": settings.SERVER_PORT,
         "log_level": settings.SERVER_LOG_LEVEL,
-        "timeout": settings.SERVER_TTL,
+        "timeout_keep_alive": settings.SERVER_TTL,
         "reload": True if settings.APP_ENV == "dev" else False,
     }
     if settings.APP_ENV == "prod":

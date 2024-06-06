@@ -15,11 +15,6 @@ class UserService:
         hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
         return hashed_password
 
-    def _verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        password_byte_enc = plain_password.encode("utf-8")
-        hashed_password_byte_enc = hashed_password.encode("utf-8")
-        return bcrypt.checkpw(password=password_byte_enc, hashed_password=hashed_password_byte_enc)
-
     async def get_users(self) -> List[UserReadSchema]:
         return await self.user_repository.get_all()
 
