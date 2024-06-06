@@ -1,8 +1,7 @@
 import os
 import time
-from typing import List
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request, Response, HTTPException, status, Depends
+from fastapi import FastAPI, Request, Response
 from src.config import get_settings
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.gzip import GZipMiddleware

@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
 from datetime import timedelta
 import src.modules.user.schemas as user_schemas
 from src.config import get_settings
@@ -8,9 +7,9 @@ import src.modules.auth.service as auth_service
 from src.database.database import get_session
 from sqlalchemy.orm import Session
 
-settings = get_settings()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# settings = get_settings()
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(
     prefix="/api",

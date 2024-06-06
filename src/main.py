@@ -14,5 +14,14 @@ app.include_router(user_router.router)
 register_middlewares(app)
 register_exception_handlers(app)
 
+def start():
+    uvicorn.run(
+        "src.main:app",
+        host=settings.SERVER_HOST,
+        port=settings.SERVER_PORT,
+        reload=True,
+        reload_exclude=["__pycache__", "**/__pycache__/**"]
+    )
+
 if __name__ == "__main__":
-    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
+    start()

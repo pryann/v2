@@ -1,12 +1,11 @@
 import bcrypt
 from typing import List
-from src.modules.user.schemas import UserCreate, UserRead, UserUpdateProfile
+from src.modules.user.schemas import UserCreateSchema, UserReadSchema, UserUpdateProfileSchema
 from src.modules.user.crud import UserRepository
-from src.utils.base_service import BaseService
 from src.exceptions.exceptions import NotFoundError
 
 
-class UserService(BaseService):
+class UserService:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
@@ -21,23 +20,23 @@ class UserService(BaseService):
         hashed_password_byte_enc = hashed_password.encode("utf-8")
         return bcrypt.checkpw(password=password_byte_enc, hashed_password=hashed_password_byte_enc)
 
-    async def get_users(self) -> List[UserRead]:
+    async def get_users(self) -> List[UserReadSchema]:
         return await self.user_repository.get_all()
 
-    async def get_user_by_id(self, user_id: int) -> UserRead:
+    async def get_user_by_id(self, user_id: int) -> UserReadSchema:
         user = await self.user_repository.get_by_id(user_id)
         if user is None:
             raise NotFoundError("User not found")
         return user
 
-    async def get_user_by_email(self, email: str) -> UserRead:
+    async def get_user_by_email(self, email: str) -> UserReadSchema:
         return await self.user_repository.get_by_email(email)
 
-    async def create_user(self, user_data: UserCreate) -> UserRead:
+    async def create_user(self, user_data: UserCreateSchema) -> UserReadSchema:
         user_data.password = self._hash_password(user_data.password).decode("utf-8")
         return await self.user_repository.create(user_data)
 
-    async def update_user(self, user_id: int, user_data: UserUpdateProfile) -> UserRead:
+    async def update_user(self, user_id: int, user_data: UserUpdateProfileSchema) -> UserReadSchema:
         user = await self.user_repository.get_by_id(user_id)
         if user is None:
             raise NotFoundError("User not found")

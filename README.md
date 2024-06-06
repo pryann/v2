@@ -12,4 +12,6 @@
 - alembic upgrade head
 
 - update all: `pip freeze | %{$_.split('==')[0]} | %{pip install --upgrade $_}`
+- pip install poetry
+- poetry init
 - add packeges from requirements.txt to poetry  @(cat requirements.txt) | %{&poetry add $_}
