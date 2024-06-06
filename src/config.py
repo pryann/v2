@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     SERVER_HOST: str
     SERVER_PORT: int
     SERVER_LOG_LEVEL: str
+    SERVER_TTL: int
     DATABASE_ENGINE: str
     DATABASE_HOST: str
     DATABASE_PORT: int

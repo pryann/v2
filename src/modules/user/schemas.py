@@ -1,7 +1,7 @@
 from pydantic import EmailStr, Field, constr
 from typing import Annotated
 from src.modules.user.consts import UserStatusEnum, UserRoleEnum
-from src.utils import BaseSchema
+from src.utils.basse_schema import BaseSchema
 
 password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
 PasswordType = Annotated[str, constr(pattern=password_regex)]

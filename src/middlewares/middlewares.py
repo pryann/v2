@@ -5,12 +5,10 @@ from fastapi import FastAPI, Request, Response
 from src.config import get_settings
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-import logging.config
+from src.utils.logger import get_logger
 
 settings = get_settings()
-current_dir = os.path.dirname(os.path.abspath(__file__))
-logging_ini_path = os.path.abspath(os.path.join(current_dir, "../..", "logging.ini"))
-logging.config.fileConfig(logging_ini_path, disable_existing_loggers=False)
+logger = get_logger(__name__)
 
 
 def setup_cors_middleware(app: FastAPI):
@@ -48,7 +46,7 @@ def setup_process_time_middleware(app: FastAPI):
         response: Response = await call_next(request)
         process_time = str(round(time.time() - start_time, 3))
         response.headers["X-Process-Time"] = process_time
-        logging.info("ProcessTime=%s", process_time)
+        logger.info("ProcessTime=%s", process_time)
         return response
 
 

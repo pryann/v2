@@ -24,7 +24,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 start = "test:start"
-dev = "src.main:start"
+test = "src.main:start"
+dev = "uvicorn src.main:app --reload"
 
 [[tool.poetry.packages]]
 include = "**/*.py"
+ 
