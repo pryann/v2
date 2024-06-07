@@ -1,34 +1,22 @@
 import jwt
 import bcrypt
-from datetime import datetime, timedelta
-from fastapi import Depends
-from src.config import get_settings, Settings
+from datetime import timedelta
+from src.config import Settings
 from src.exceptions.exceptions import NotFoundError, AuthencticationError
 from src.modules.auth.schemas import LoginSchema, LoginReadSchema
 from src.modules.user.crud import UserRepository
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict
-
-
-class TokenService:
-    def generate_token(self, user: LoginReadSchema, expires_delta: timedelta, secret_key: str, algorithm: str) -> str:
-        expire = datetime.now(timezone.utc) + expires_delta
-        to_encode = {"id": user.id, "email": user.email, "role": user.role, "exp": expire}
-        return jwt.encode(to_encode, secret_key, algorithm=algorithm)
-
-    def decode_token(self, token: str, secret_key: str, algorithm: str) -> dict[str, Any]:
-        return jwt.decode(token, secret_key, algorithms=[algorithm])
+from src.utils.token_handler import TokenHandler
 
 
 class AuthService:
     def __init__(
         self,
         user_repository: UserRepository,
-        token_service: TokenService,
+        token_handler: TokenHandler,
         settings: Settings,
     ):
         self.user_repository = user_repository
-        self.token_service = token_service
+        self.token_service = token_handler
         self.settings = settings
 
     def _generate_access_token(self, user: LoginReadSchema) -> str:

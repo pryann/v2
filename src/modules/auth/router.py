@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi import APIRouter, Depends, status, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import Settings, get_settings
 from src.database.database import get_session
+from src.utils.token_handler import TokenHandler
 from src.modules.auth.schemas import LoginSchema
-from src.modules.auth.service import AuthService, TokenService
+from src.modules.auth.service import AuthService
 from src.modules.user.crud import UserRepository
 
 router = APIRouter(
@@ -17,8 +18,8 @@ def get_auth_service(
     settings: Settings = Depends(get_settings),
 ) -> AuthService:
     user_repository = UserRepository(session)
-    token_service = TokenService()
-    return AuthService(user_repository=user_repository, token_service=token_service, settings=settings)
+    token_service = TokenHandler()
+    return AuthService(user_repository=user_repository, token_handler=token_service, settings=settings)
 
 
 @router.post("/login", status_code=status.HTTP_204_NO_CONTENT)
