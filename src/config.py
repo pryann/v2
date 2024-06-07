@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     SERVER_PORT: int
     SERVER_LOG_LEVEL: str
     SERVER_TTL: int
+    SSL_KEYFILE: str
+    SSL_CERTFILE: str
     DATABASE_ENGINE: str
     DATABASE_HOST: str
     DATABASE_PORT: int

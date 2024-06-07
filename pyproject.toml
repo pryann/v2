@@ -24,10 +24,12 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-start = "test:start"
-test = "src.main:start"
-dev = "uvicorn src.main:app --reload"
+dev = "src.scripts:dev"
+prod = "src.scripts:prod"
+alembic-init = "src.scripts:alembic_init"
+alembic-revision = "src.scripts:alembic_revision"
+alembic-upgrade = "src.scripts:alembic_upgrade"
+alembic-downgrade = "src.scripts:alembic_downgrade"
 
 [[tool.poetry.packages]]
 include = "**/*.py"
- 

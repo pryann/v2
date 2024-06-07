@@ -7,6 +7,8 @@ import asyncio
 
 
 def generate_response(status_code: int, message: str):
+    if status_code == 500:
+        message = "Internal server error"
     return JSONResponse(
         status_code=status_code,
         content=jsonable_encoder({"status_code": status_code, "detail": message}),
@@ -43,6 +45,7 @@ def register_exception_handlers(app: FastAPI):
         AuthencticationError: 401,
         AuthorizationError: 403,
         asyncio.TimeoutError: 408,
+        500: 500,
     }
 
     for exception, status_code in exceptions.items():

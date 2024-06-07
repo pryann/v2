@@ -7,6 +7,7 @@ from src.exceptions.exceptions import NotFoundError, AuthencticationError
 from src.modules.auth.schemas import LoginSchema, LoginReadSchema
 from src.modules.user.crud import UserRepository
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 
 
 class TokenService:
@@ -15,7 +16,7 @@ class TokenService:
         to_encode = {"id": user.id, "email": user.email, "role": user.role, "exp": expire}
         return jwt.encode(to_encode, secret_key, algorithm=algorithm)
 
-    def decode_token(self, token: str, secret_key: str, algorithm: str):
+    def decode_token(self, token: str, secret_key: str, algorithm: str) -> Dict[str, Any]:
         return jwt.decode(token, secret_key, algorithms=[algorithm])
 
 
@@ -55,7 +56,7 @@ class AuthService:
         )
         return await self.user_repository.get_user_by_email(decoded["email"])
 
-    async def regenerate_tokens(self, refresh_token: str) -> dict[str, str]:
+    async def regenerate_tokens(self, refresh_token: str) -> Dict[str, str]:
         decoded = self.token_service.decode_token(
             refresh_token, self.settings.REFRESH_TOKEN_SECRET_KEY, self.settings.REFRESH_TOKEN_ALGORITHM
         )
@@ -65,7 +66,7 @@ class AuthService:
             "refresh_token": self._generate_refresh_token(user),
         }
 
-    async def login(self, user: LoginSchema) -> dict[str, str]:
+    async def login(self, user: LoginSchema) -> Dict[str, str]:
         db_user = await self.user_repository.get_by_email(user.email)
         if not db_user:
             raise NotFoundError("User not found")
