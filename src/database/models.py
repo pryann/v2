@@ -1,5 +1,5 @@
 from humps import camel
-from sqlalchemy import func, DateTime, Integer
+from sqlalchemy import func, DateTime
 from sqlalchemy.orm import Mapped, registry, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 import uuid

@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Annotated
+
+from pydantic import constr
 
 
 class UserStatusEnum(str, Enum):
@@ -15,3 +18,7 @@ class UserRoleEnum(str, Enum):
     USER = "USER"
     TEACHER = "TEACHER"
     SPONSORE = "SPONSORE"
+
+
+password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+PasswordType = Annotated[str, constr(pattern=password_regex)]

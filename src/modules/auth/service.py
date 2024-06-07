@@ -1,11 +1,10 @@
-import jwt
 import bcrypt
 from datetime import timedelta
 from src.config import Settings
 from src.exceptions.exceptions import NotFoundError, AuthencticationError
 from src.modules.auth.schemas import LoginSchema, LoginReadSchema
 from src.modules.user.crud import UserRepository
-from src.utils.token_handler import TokenHandler
+from src.modules.auth.utils import TokenHandler
 
 
 class AuthService:
