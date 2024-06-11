@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from src.exceptions.exceptions import NotFoundError, AlreadyExistsError, AuthencticationError, AuthorizationError
+from src.exceptions.exceptions import NotFoundError, AlreadyExistsError, AuthenticationError, AuthorizationError
 import logging
 import asyncio
 
@@ -42,7 +42,7 @@ def register_exception_handlers(app: FastAPI):
     exceptions = {
         NotFoundError: 404,
         AlreadyExistsError: 409,
-        AuthencticationError: 401,
+        AuthenticationError: 401,
         AuthorizationError: 403,
         asyncio.TimeoutError: 408,
         500: 500,

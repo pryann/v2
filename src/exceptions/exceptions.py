@@ -1,5 +1,3 @@
-# create global custom exceptions
-
 class NotFoundError(Exception):
     def __init__(self, message="Resource not found"):
         self.message = message
@@ -12,7 +10,7 @@ class AlreadyExistsError(Exception):
         super().__init__(self.message)
 
 
-class AuthencticationError(Exception):
+class AuthenticationError(Exception):
     def __init__(self, message="Authentication failed"):
         self.message = message
         super().__init__(self.message)

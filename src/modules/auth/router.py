@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, status, Response, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from src.modules.auth.utils import get_auth_service
 from src.modules.auth.utils import get_auth_service
 from src.modules.auth.schemas import LoginSchema
@@ -10,8 +12,11 @@ router = APIRouter(
     tags=["Auth"],
 )
 
+limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
+
 
 @router.post("/login", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit()
 async def login(response: Response, user: LoginSchema, auth_service: AuthService = Depends(get_auth_service)):
     tokens = await auth_service.login(user)
     response.set_cookie(key="access_token", value=tokens["access_token"], httponly=True, secure=True)

@@ -37,7 +37,7 @@ class AuthService:
     def _verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
-    async def _get_current_user_from_access_token(self, access_token: str) -> LoginReadSchema:
+    async def get_current_user_from_access_token(self, access_token: str) -> LoginReadSchema:
         decoded = self.token_service.decode_token(
             access_token, self.settings.ACCESS_TOKEN_SECRET_KEY, self.settings.ACCESS_TOKEN_ALGORITHM
         )

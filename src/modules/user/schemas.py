@@ -1,7 +1,7 @@
 from pydantic import EmailStr, Field, constr
 from typing import Annotated
+from src.utils.base_schema import BaseSchema
 from src.modules.user.consts import UserStatusEnum, UserRoleEnum
-from src.utils.basse_schema import BaseSchema
 from src.modules.user.consts import password_regex, PasswordType
 
 
