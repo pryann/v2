@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import Enum, String, Boolean, Integer
+from sqlalchemy import Enum, String, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from src.modules.user.consts import UserStatusEnum, UserRoleEnum
 from src.database.models import CustomBase
@@ -9,12 +9,11 @@ from src.modules.billing_address.models import BillingAddress
 class User(CustomBase):
     __tablename__ = "user"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    email: Mapped[str] = mapped_column(String(191), unique=True, index=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, index=True)
     terms_accepted: Mapped[bool] = mapped_column(Boolean)
     newsletter_subscription: Mapped[bool] = mapped_column(Boolean)
-    password: Mapped[bytes] = mapped_column(String(255))
+    password: Mapped[bytes] = mapped_column(String(191))
     role: Mapped[UserRoleEnum] = mapped_column(
         Enum(UserRoleEnum),
         default=UserRoleEnum.USER.value,

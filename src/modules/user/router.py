@@ -2,8 +2,9 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status, Depends
 from src.modules.user.service import UserService
 from src.modules.user.schemas import UserReadSchema, UserCreateSchema, UserUpdateProfileSchema
-from src.modules.user.utils import get_user_service
-
+from src.modules.user.consts import UserRoleEnum
+from src.modules.user.deps import get_user_service
+from src.modules.auth.deps import require_role
 
 router = APIRouter(
     prefix="/api/users",
@@ -18,13 +19,22 @@ async def get_existing_user_by_id(user_id: int, user_service: UserService = Depe
     return user
 
 
-@router.get("/", response_model=List[UserReadSchema])
+@router.get("/", response_model=List[UserReadSchema], dependencies=[Depends(require_role)])
 async def list_users(user_service: UserService = Depends(get_user_service)):
     return await user_service.get_users()
 
 
-@router.get("/{user_id}", response_model=UserReadSchema)
-async def find_user(user_id: int, user: UserReadSchema = Depends(get_existing_user_by_id)):
+@router.get(
+    "/{user_id}",
+    response_model=UserReadSchema,
+)
+async def find_user(
+    user_id: int,
+    user: UserReadSchema = Depends(get_existing_user_by_id),
+    user_from_token: UserReadSchema = Depends(lambda: require_role([UserRoleEnum.ADMIN.value])),
+):
+    if user_from_token.id != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
     return user
 
 
@@ -37,7 +47,7 @@ async def create_user(user: UserCreateSchema, user_service: UserService = Depend
     return new_user
 
 
-@router.put("/{user_id}", response_model=UserReadSchema)
+@router.put("/{user_id}", response_model=UserReadSchema, dependencies=[Depends(require_role)])
 async def update_user(
     user_id: int,
     user: UserUpdateProfileSchema,
@@ -47,7 +57,7 @@ async def update_user(
     return await user_service.update_user(user_id, user)
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_role)])
 async def delete_user(
     user_id: int,
     user_service: UserService = Depends(get_user_service),

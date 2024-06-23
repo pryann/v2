@@ -1,6 +1,6 @@
 from pydantic import EmailStr
 from src.modules.user.consts import UserRoleEnum
-from src.utils.base_schema import BaseSchema
+from src.utils import BaseSchema
 
 
 class LoginSchema(BaseSchema):

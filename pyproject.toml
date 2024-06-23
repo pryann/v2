@@ -20,6 +20,9 @@ alembic = "^1.13.1"
 
 pyjwt = "^2.8.0"
 slowapi = "^0.1.9"
+aioredis = "^2.0.1"
+loguru = "^0.7.2"
+sentry-sdk = "^2.6.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

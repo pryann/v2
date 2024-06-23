@@ -2,7 +2,7 @@ import bcrypt
 from typing import List
 from src.modules.user.schemas import UserCreateSchema, UserReadSchema, UserUpdateProfileSchema
 from src.modules.user.crud import UserRepository
-from src.exceptions.exceptions import NotFoundError
+from src.exceptions.custom_exceptions import NotFoundError
 
 
 class UserService:

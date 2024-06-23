@@ -7,13 +7,12 @@ from src.database.models import CustomBase
 class BillingAddress(CustomBase):
     __tablename__ = "billing_address"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(255))
-    country: Mapped[str] = mapped_column(String(255))
-    state: Mapped[str] = mapped_column(String(255))
-    city: Mapped[str] = mapped_column(String(255))
+    name: Mapped[str] = mapped_column(String(191))
+    country: Mapped[str] = mapped_column(String(191))
+    state: Mapped[str] = mapped_column(String(191))
+    city: Mapped[str] = mapped_column(String(191))
     zip_code: Mapped[str] = mapped_column(String(10))
-    address: Mapped[str] = mapped_column(String(288))
+    address: Mapped[str] = mapped_column(String(191))
     tax_number: Mapped[str] = mapped_column(String(10))
     outside_eu: Mapped[bool]
 

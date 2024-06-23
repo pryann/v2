@@ -1,5 +1,5 @@
 from humps import camel
-from sqlalchemy import func, DateTime
+from sqlalchemy import func, DateTime, Integer
 from sqlalchemy.orm import Mapped, registry, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -16,6 +16,7 @@ Base = mapper_registry.generate_base()
 class CustomBase(Base):
     __abstract__ = True
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     uuid: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=False, default=uuid.uuid4, unique=True, nullable=False
     )

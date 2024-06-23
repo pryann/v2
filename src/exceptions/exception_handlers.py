@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
-from src.exceptions.exceptions import NotFoundError, AlreadyExistsError, AuthenticationError, AuthorizationError
+from src.exceptions.custom_exceptions import NotFoundError, AlreadyExistsError, AuthenticationError, AuthorizationError
 import logging
 import asyncio
 

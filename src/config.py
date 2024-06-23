@@ -19,7 +19,11 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
     DATABASE_USER: str
     DATABASE_PASSWORD: str
+    REDIS_HOST: str
+    REDIS_PORT: int
     CORS_ORIGINS: str
+    RATE_LIMIT_HARD_LIMIT: str
+    RATE_LIMIT_SOFT_LIMIT: str
     ACCESS_TOKEN_SECRET_KEY: str
     ACCESS_TOKEN_ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int

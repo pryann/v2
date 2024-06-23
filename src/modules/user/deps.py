@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.modules.user.service import UserService
-from src.database.database import get_session
+from src.database.pg_database import get_session
 from src.modules.user.crud import UserRepository
 
 

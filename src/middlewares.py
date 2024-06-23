@@ -8,14 +8,10 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from src.config import get_settings
-from src.utils.logger import get_logger
+from src.utils import get_logger
 
-settings = (get_settings()
-logger = get_logger(__name__)
-global_limiter = Limiter(key_func=lambda request: request.client.host, default_limits=["100/minute"])
-
-
-def setup_cors_middleware(app: FastAPI):
+# class middlewares
+def setup_cors_middleware(app: FastAPI, settings):
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS_LIST,
@@ -24,10 +20,10 @@ def setup_cors_middleware(app: FastAPI):
         allow_headers=["*"],
     )
 
-
+# function middlewares
 def setup_security_headers_middleware(app: FastAPI):
     @app.middleware("http")
-    async def add_security_headers(request: Request, call_next):
+    async def security_headers_middleware(request: Request, call_next):
         response = await call_next(request)
         response.headers.update(
             {
@@ -42,7 +38,7 @@ def setup_security_headers_middleware(app: FastAPI):
         return response
 
 
-def setup_process_time_middleware(app: FastAPI):
+def setup_process_time_log_middleware(app: FastAPI, logger):
     @app.middleware("http")
     async def process_time_log_middleware(request: Request, call_next):
         start_time = time.time()
@@ -53,17 +49,24 @@ def setup_process_time_middleware(app: FastAPI):
         return response
 
 
-def setup_rate_limit_middleware(app: FastAPI):
-    app.state.limiter = global_limiter
+def setup_global_rate_limit_middleware(app: FastAPI):
+    app.state.limiter = Limiter(key_func=lambda request: request.client.host, default_limits=["100/minute"])
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_middleware(SlowAPIMiddleware)
 
 
 def register_middlewares(app: FastAPI):
-    # functions
-    setup_cors_middleware(app)
-    setup_security_headers_middleware(app)
-    setup_process_time_middleware(app)
-    setup_rate_limit_middleware(app)
-    # classes
+    settings = get_settings()
+    logger = get_logger(__name__)
+
+    function_middlewares = [
+        setup_cors_middleware,
+        setup_security_headers_middleware,
+        setup_process_time_log_middleware,
+        setup_global_rate_limit_middleware,
+    ]
+
+    for setup in function_middlewares:
+        setup(app, settings, logger)
+
     app.add_middleware(GZipMiddleware)
